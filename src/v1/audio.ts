@@ -87,6 +87,12 @@ app.openapi(
 							}),
 						]),
 					},
+					"text/plain": {
+						schema: z.string(),
+					},
+					"text/vtt": {
+						schema: z.string(),
+					},
 				},
 				description: "Retrieve the user",
 			},
@@ -114,9 +120,7 @@ app.openapi(
 							text: response.text,
 						});
 					case "text":
-						throw new HTTPException(500, {
-							message: "Not implemented",
-						});
+						return c.text(response.text);
 					case "srt":
 						throw new HTTPException(500, {
 							message: "Not implemented",
@@ -126,8 +130,8 @@ app.openapi(
 							message: "Not implemented",
 						});
 					case "vtt":
-						throw new HTTPException(500, {
-							message: "Not implemented",
+						return c.text(response.vtt ?? "WEBVTT\n\n", 200, {
+							"Content-Type": "text/vtt",
 						});
 					default:
 						throw new HTTPException(500, {
@@ -145,9 +149,7 @@ app.openapi(
 							text: response.text,
 						});
 					case "text":
-						throw new HTTPException(500, {
-							message: "Not implemented",
-						});
+						return c.text(response.text);
 					case "srt":
 						throw new HTTPException(500, {
 							message: "Not implemented",
@@ -157,8 +159,8 @@ app.openapi(
 							message: "Not implemented",
 						});
 					case "vtt":
-						throw new HTTPException(500, {
-							message: "Not implemented",
+						return c.text(response.vtt ?? "WEBVTT\n\n", 200, {
+							"Content-Type": "text/vtt",
 						});
 					default:
 						throw new HTTPException(500, {
@@ -179,20 +181,94 @@ app.openapi(
 							text: response.text,
 						});
 					case "text":
-						throw new HTTPException(500, {
-							message: "Not implemented",
-						});
+						return c.text(response.text);
 					case "srt":
 						throw new HTTPException(500, {
 							message: "Not implemented",
 						});
-					case "verbose_json":
-						throw new HTTPException(500, {
-							message: "Not implemented",
+					case "verbose_json": {
+						if (
+							response.transcription_info === undefined ||
+							response.transcription_info === null ||
+							response.transcription_info.language === undefined ||
+							response.transcription_info.language === null ||
+							response.transcription_info.duration === undefined ||
+							response.transcription_info.duration === null
+						) {
+							throw new HTTPException(500, {
+								message: "Transcription info not found",
+							});
+						}
+						const rawSegments = (response.segments ?? []) as Exclude<
+							Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output["segments"],
+							undefined
+						>[];
+						const words = [];
+						const segments = [];
+						for (const rawSegment of rawSegments) {
+							if (
+								!(
+									rawSegment.start === undefined || rawSegment.start === null
+								) &&
+								!(rawSegment.end === undefined || rawSegment.end === null) &&
+								!(rawSegment.text === undefined || rawSegment.text === null) &&
+								!(
+									rawSegment.temperature === undefined ||
+									rawSegment.temperature === null
+								) &&
+								!(
+									rawSegment.avg_logprob === undefined ||
+									rawSegment.avg_logprob === null
+								) &&
+								!(
+									rawSegment.compression_ratio === undefined ||
+									rawSegment.compression_ratio === null
+								) &&
+								!(
+									rawSegment.no_speech_prob === undefined ||
+									rawSegment.no_speech_prob === null
+								)
+							) {
+								segments.push({
+									id: 0,
+									seek: 0,
+									start: rawSegment.start,
+									end: rawSegment.end,
+									text: rawSegment.text,
+									tokens: [],
+									temperature: rawSegment.temperature,
+									avg_logprob: rawSegment.avg_logprob,
+									compression_ratio: rawSegment.compression_ratio,
+									no_speech_prob: rawSegment.no_speech_prob,
+								});
+							}
+							if (rawSegment.words) {
+								for (const rawWord of rawSegment.words) {
+									if (rawWord.start && rawWord.end && rawWord.word) {
+										words.push({
+											word: rawWord.word,
+											start: rawWord.start,
+											end: rawWord.end,
+										});
+									}
+								}
+							}
+						}
+						return c.json({
+							language: response.transcription_info.language,
+							duration: response.transcription_info.duration,
+							text: response.text,
+							words: timestamp_granularities.includes("word")
+								? words
+								: undefined,
+							segments: timestamp_granularities.includes("segment")
+								? segments
+								: undefined,
 						});
+					}
 					case "vtt":
-						throw new HTTPException(500, {
-							message: "Not implemented",
+						return c.text(response.vtt ?? "WEBVTT\n\n", 200, {
+							"Content-Type": "text/vtt",
 						});
 					default:
 						throw new HTTPException(500, {
