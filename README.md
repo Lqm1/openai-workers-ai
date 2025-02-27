@@ -1,6 +1,6 @@
 # OpenAI Workers AI
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button.svg)](https://dash.cloudflare.com/workers/deploy/?account=YOUR_ACCOUNT_ID&script=openai-workers-ai)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Lqm1/openai-workers-ai)
 
 OpenAI Workers AI is an OpenAI-compatible API hosted on Cloudflare Workers. It leverages Cloudflare Workers AI to process and transcribe audio using various Whisper-based models. The project is built with the Hono framework and provides OpenAPI documentation with Swagger UI.
 
