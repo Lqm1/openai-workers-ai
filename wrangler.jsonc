@@ -3,7 +3,7 @@
 	"name": "openai-workers-ai",
 	"main": "src/index.ts",
 	"compatibility_flags": ["nodejs_compat"],
-	"compatibility_date": "2025-02-14",
+	"compatibility_date": "2025-03-06",
 	"observability": {
 		"enabled": true
 	},

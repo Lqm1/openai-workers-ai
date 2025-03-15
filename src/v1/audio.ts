@@ -199,51 +199,45 @@ app.openapi(
 								message: "Transcription info not found",
 							});
 						}
-						const rawSegments = (response.segments ?? []) as Exclude<
-							Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output["segments"],
-							undefined
-						>[];
 						const words = [];
 						const segments = [];
-						for (const rawSegment of rawSegments) {
+						for (const segment of response.segments ?? []) {
 							if (
+								!(segment.start === undefined || segment.start === null) &&
+								!(segment.end === undefined || segment.end === null) &&
+								!(segment.text === undefined || segment.text === null) &&
 								!(
-									rawSegment.start === undefined || rawSegment.start === null
-								) &&
-								!(rawSegment.end === undefined || rawSegment.end === null) &&
-								!(rawSegment.text === undefined || rawSegment.text === null) &&
-								!(
-									rawSegment.temperature === undefined ||
-									rawSegment.temperature === null
+									segment.temperature === undefined ||
+									segment.temperature === null
 								) &&
 								!(
-									rawSegment.avg_logprob === undefined ||
-									rawSegment.avg_logprob === null
+									segment.avg_logprob === undefined ||
+									segment.avg_logprob === null
 								) &&
 								!(
-									rawSegment.compression_ratio === undefined ||
-									rawSegment.compression_ratio === null
+									segment.compression_ratio === undefined ||
+									segment.compression_ratio === null
 								) &&
 								!(
-									rawSegment.no_speech_prob === undefined ||
-									rawSegment.no_speech_prob === null
+									segment.no_speech_prob === undefined ||
+									segment.no_speech_prob === null
 								)
 							) {
 								segments.push({
 									id: 0,
 									seek: 0,
-									start: rawSegment.start,
-									end: rawSegment.end,
-									text: rawSegment.text,
+									start: segment.start,
+									end: segment.end,
+									text: segment.text,
 									tokens: [],
-									temperature: rawSegment.temperature,
-									avg_logprob: rawSegment.avg_logprob,
-									compression_ratio: rawSegment.compression_ratio,
-									no_speech_prob: rawSegment.no_speech_prob,
+									temperature: segment.temperature,
+									avg_logprob: segment.avg_logprob,
+									compression_ratio: segment.compression_ratio,
+									no_speech_prob: segment.no_speech_prob,
 								});
 							}
-							if (rawSegment.words) {
-								for (const rawWord of rawSegment.words) {
+							if (segment.words) {
+								for (const rawWord of segment.words) {
 									if (rawWord.start && rawWord.end && rawWord.word) {
 										words.push({
 											word: rawWord.word,
