@@ -201,43 +201,45 @@ app.openapi(
 						}
 						const words = [];
 						const segments = [];
-						for (const segment of response.segments ?? []) {
+						for (const rawSegment of response.segments ?? []) {
 							if (
-								!(segment.start === undefined || segment.start === null) &&
-								!(segment.end === undefined || segment.end === null) &&
-								!(segment.text === undefined || segment.text === null) &&
 								!(
-									segment.temperature === undefined ||
-									segment.temperature === null
+									rawSegment.start === undefined || rawSegment.start === null
+								) &&
+								!(rawSegment.end === undefined || rawSegment.end === null) &&
+								!(rawSegment.text === undefined || rawSegment.text === null) &&
+								!(
+									rawSegment.temperature === undefined ||
+									rawSegment.temperature === null
 								) &&
 								!(
-									segment.avg_logprob === undefined ||
-									segment.avg_logprob === null
+									rawSegment.avg_logprob === undefined ||
+									rawSegment.avg_logprob === null
 								) &&
 								!(
-									segment.compression_ratio === undefined ||
-									segment.compression_ratio === null
+									rawSegment.compression_ratio === undefined ||
+									rawSegment.compression_ratio === null
 								) &&
 								!(
-									segment.no_speech_prob === undefined ||
-									segment.no_speech_prob === null
+									rawSegment.no_speech_prob === undefined ||
+									rawSegment.no_speech_prob === null
 								)
 							) {
 								segments.push({
 									id: 0,
 									seek: 0,
-									start: segment.start,
-									end: segment.end,
-									text: segment.text,
+									start: rawSegment.start,
+									end: rawSegment.end,
+									text: rawSegment.text,
 									tokens: [],
-									temperature: segment.temperature,
-									avg_logprob: segment.avg_logprob,
-									compression_ratio: segment.compression_ratio,
-									no_speech_prob: segment.no_speech_prob,
+									temperature: rawSegment.temperature,
+									avg_logprob: rawSegment.avg_logprob,
+									compression_ratio: rawSegment.compression_ratio,
+									no_speech_prob: rawSegment.no_speech_prob,
 								});
 							}
-							if (segment.words) {
-								for (const rawWord of segment.words) {
+							if (rawSegment.words) {
+								for (const rawWord of rawSegment.words) {
 									if (rawWord.start && rawWord.end && rawWord.word) {
 										words.push({
 											word: rawWord.word,
